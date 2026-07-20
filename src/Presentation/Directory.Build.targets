@@ -1,0 +1,4 @@
+<Project>
+  <!-- 覆盖 Avalonia.BuildServices 的遥测任务，沙箱环境无权限写日志 -->
+  <Target Name="AvaloniaStats" BeforeTargets="CoreCompile" />
+</Project>

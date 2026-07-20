@@ -1,0 +1,10 @@
+.trae
+.dotnet
+.idea
+.DS_Store
+.thumbs.db
+.reasonix
+reasonix.toml
+src/Presentation/obj
+src/Presentation/bin
+publish

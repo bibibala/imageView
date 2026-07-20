@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ImageViewer.Presentation.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="ImageViewer.Presentation.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Image"
+        Width="1000" Height="700"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainViewModel>
+            <x:Arguments>
+                <x:Null />
+                <x:Null />
+            </x:Arguments>
+        </vm:MainViewModel>
+    </Design.DataContext>
+
+    <DockPanel LastChildFill="True">
+
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                Padding="10,5">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Spacing="4">
+                    <Button Content="打开图片" Click="OnOpenFileClick" />
+                    <Button Content="打开文件夹" Click="OnOpenFolderClick" />
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                    <Button Content="{Binding ThemeLabel}" Command="{Binding ToggleThemeCommand}"
+                            ToolTip.Tip="切换亮色 / 暗色主题" />
+                    <Button Content="⛶" Command="{Binding ToggleFullScreenCommand}" ToolTip.Tip="全屏 F" />
+                    <Button Content="↻" Command="{Binding RotateClockwiseCommand}" ToolTip.Tip="右旋 90°"
+                            Margin="8,0,0,0" />
+                    <Button Content="↺" Command="{Binding RotateCounterClockwiseCommand}" ToolTip.Tip="左旋 90°" />
+                    <Button Content="+" Command="{Binding ZoomInCommand}" ToolTip.Tip="放大"
+                            Margin="8,0,0,0" />
+                    <Button Content="−" Command="{Binding ZoomOutCommand}" ToolTip.Tip="缩小" />
+                    <Button Content="1:1" Command="{Binding ResetTransformCommand}" ToolTip.Tip="重置缩放旋转" />
+                    <Button Content="◀" Command="{Binding PreviousCommand}"
+                            IsEnabled="{Binding CanGoPrevious}" ToolTip.Tip="上一张"
+                            Margin="8,0,0,0" />
+                    <Button Content="▶" Command="{Binding NextCommand}"
+                            IsEnabled="{Binding CanGoNext}" ToolTip.Tip="下一张" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border DockPanel.Dock="Bottom"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                Padding="12,4">
+            <TextBlock Text="{Binding StatusMessage}" />
+        </Border>
+
+        <Panel Background="#1E1E1E">
+            <ScrollViewer x:Name="ImageScrollViewer"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          IsVisible="{Binding HasImage}">
+                <LayoutTransformControl HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <LayoutTransformControl.LayoutTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="{Binding Rotation}" />
+                            <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+                        </TransformGroup>
+                    </LayoutTransformControl.LayoutTransform>
+                    <Image x:Name="ImageView"
+                           Source="{Binding CurrentImage}"
+                           Stretch="Uniform"
+                           StretchDirection="DownOnly" />
+                </LayoutTransformControl>
+            </ScrollViewer>
+
+            <TextBlock Text="拖入图片或点击工具栏打开"
+                       Foreground="#888"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding !HasImage}" />
+        </Panel>
+    </DockPanel>
+</Window>
