@@ -19,7 +19,8 @@ cd "$SCRIPT_DIR"
 
 DOTNET="$SCRIPT_DIR/.dotnet/dotnet/dotnet"
 PROJECT_DIR="$SCRIPT_DIR/src/Presentation"
-ICON="$PROJECT_DIR/Assets/avalonia-logo.ico"
+ICON="$PROJECT_DIR/Assets/icon.ico"
+ICNS_SOURCE="$PROJECT_DIR/Assets/icon.icns"
 
 APP_NAME="ImageViewer"
 APP_TITLE="Image"
@@ -117,22 +118,27 @@ if [ "$PLATFORM" = "osx" ]; then
     chmod +x "$MACOS_DIR/$APP_NAME" 2>/dev/null || true
 
     # ---------- 生成 macOS 专用图标 (.icns) ----------
-    # macOS 只认 .icns，直接把 .ico 塞进 Info.plist 是不会显示的（一直会退回系统默认图标）。
-    # 优先使用 Assets/AppIcon.png（建议 1024x1024）；没有的话尝试从现有 .ico 里提取最大的一帧来转换。
-    PNG_SOURCE="$PROJECT_DIR/Assets/AppIcon.png"
     ICONSET_DIR="$OUTPUT_DIR/AppIcon.iconset"
     ICNS_OUT="$RES_DIR/AppIcon.icns"
     ICON_OK=false
 
-    rm -rf "$ICONSET_DIR"
-    mkdir -p "$ICONSET_DIR"
-
-    if [ -f "$PNG_SOURCE" ]; then
-        SRC_PNG="$PNG_SOURCE"
+    if [ -f "$ICNS_SOURCE" ]; then
+        # 已有现成 .icns，直接使用
+        cp "$ICNS_SOURCE" "$ICNS_OUT"
+        ICON_OK=true
+        echo "  图标: 使用已有 $ICNS_SOURCE"
     else
-        echo "  未找到 $PNG_SOURCE，尝试从 $ICON 提取最大尺寸帧 ..."
-        SRC_PNG="$OUTPUT_DIR/icon_from_ico.png"
-        python3 - "$ICON" "$SRC_PNG" << 'PYEOF' 2>/dev/null || true
+        # 回退：从 PNG/ICO 生成 .icns
+        PNG_SOURCE="$PROJECT_DIR/Assets/AppIcon.png"
+        rm -rf "$ICONSET_DIR"
+        mkdir -p "$ICONSET_DIR"
+
+        if [ -f "$PNG_SOURCE" ]; then
+            SRC_PNG="$PNG_SOURCE"
+        else
+            echo "  未找到 $PNG_SOURCE，尝试从 $ICON 提取最大尺寸帧 ..."
+            SRC_PNG="$OUTPUT_DIR/icon_from_ico.png"
+            python3 - "$ICON" "$SRC_PNG" << 'PYEOF' 2>/dev/null || true
 import sys
 from PIL import Image
 src, out = sys.argv[1], sys.argv[2]
@@ -149,21 +155,22 @@ except EOFError:
 best = max(frames, key=lambda f: f.size[0]) if frames else img
 best.convert("RGBA").save(out)
 PYEOF
-    fi
-
-    if [ -f "$SRC_PNG" ]; then
-        for size in 16 32 128 256 512; do
-            double=$((size * 2))
-            sips -z $size $size "$SRC_PNG" --out "$ICONSET_DIR/icon_${size}x${size}.png" > /dev/null 2>&1
-            sips -z $double $double "$SRC_PNG" --out "$ICONSET_DIR/icon_${size}x${size}@2x.png" > /dev/null 2>&1
-        done
-        sips -z 1024 1024 "$SRC_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png" > /dev/null 2>&1
-
-        if iconutil -c icns "$ICONSET_DIR" -o "$ICNS_OUT" > /dev/null 2>&1; then
-            ICON_OK=true
         fi
+
+        if [ -f "$SRC_PNG" ]; then
+            for size in 16 32 128 256 512; do
+                double=$((size * 2))
+                sips -z $size $size "$SRC_PNG" --out "$ICONSET_DIR/icon_${size}x${size}.png" > /dev/null 2>&1
+                sips -z $double $double "$SRC_PNG" --out "$ICONSET_DIR/icon_${size}x${size}@2x.png" > /dev/null 2>&1
+            done
+            sips -z 1024 1024 "$SRC_PNG" --out "$ICONSET_DIR/icon_512x512@2x.png" > /dev/null 2>&1
+
+            if iconutil -c icns "$ICONSET_DIR" -o "$ICNS_OUT" > /dev/null 2>&1; then
+                ICON_OK=true
+            fi
+        fi
+        rm -rf "$ICONSET_DIR"
     fi
-    rm -rf "$ICONSET_DIR"
 
     if [ "$ICON_OK" = true ]; then
         ICON_PLIST_NAME="AppIcon"
@@ -171,7 +178,7 @@ PYEOF
     else
         # 兜底：至少把原 .ico 也复制进去，虽然不会显示，但不影响其他功能
         cp "$ICON" "$RES_DIR/" 2>/dev/null || true
-        ICON_PLIST_NAME="avalonia-logo.ico"
+        ICON_PLIST_NAME="icon.ico"
         echo "  警告: 未能生成 .icns（可能缺 python3/Pillow，或没有可用的 png/ico 源），图标会显示为系统默认。"
         echo "        可执行: pip3 install --break-system-packages Pillow  然后重新打包。"
     fi

@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="ImageViewer.Presentation.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/icon.ico"
         Title="{loc:Loc AppTitle}"
         Width="1000" Height="700"
         WindowStartupLocation="CenterScreen"

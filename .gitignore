@@ -9,6 +9,7 @@ obj/
 # .NET SDK (bundled)
 .dotnet/
 .publish/
+.src/.packages
 
 # IDE
 .idea/

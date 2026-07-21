@@ -7,7 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>ImageViewer</RootNamespace>
     <ApplicationTitle>Image</ApplicationTitle>
-    <ApplicationIcon>Assets\avalonia-logo.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <Authors>nightwish</Authors>
     <Copyright>Copyright © 2025 nightwish</Copyright>
     <Description>A clean and fast image viewer for macOS And Windows</Description>

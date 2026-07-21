@@ -24,6 +24,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        Name = "ImageViewer";
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
