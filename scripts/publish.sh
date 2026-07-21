@@ -15,18 +15,26 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-DOTNET="$SCRIPT_DIR/.dotnet/dotnet/dotnet"
-PROJECT_DIR="$SCRIPT_DIR/src"
+DOTNET="$ROOT_DIR/.dotnet/dotnet/dotnet"
+PROJECT_DIR="$ROOT_DIR/src"
+PROJECT_FILE="$PROJECT_DIR/ImageViewer.csproj"
 ICON="$PROJECT_DIR/Assets/icon.ico"
 ICNS_SOURCE="$PROJECT_DIR/Assets/icon.icns"
 
-APP_NAME="ImageViewer"
-APP_TITLE="Image"
-APP_VERSION="1.0.0"
-BUNDLE_ID="com.nightwish.image"
-OUTPUT_DIR="$SCRIPT_DIR/publish"
+# 从 csproj 提取元数据
+csproj_value() {
+    local tag="$1"
+    sed -n "s|.*<$tag>\([^<]*\)</$tag>.*|\1|p" "$PROJECT_FILE" | head -1
+}
+
+APP_NAME="$(csproj_value RootNamespace)"
+APP_TITLE="$(csproj_value ApplicationTitle)"
+APP_VERSION="$(csproj_value Version)"
+APP_PUBLISHER="$(csproj_value Authors)"
+BUNDLE_ID="com.$(echo "$APP_PUBLISHER" | tr '[:upper:]' '[:lower:]').$(echo "$APP_TITLE" | tr '[:upper:]' '[:lower:]')"
+OUTPUT_DIR="$ROOT_DIR/publish"
 
 # ---------- 参数解析 ----------
 RID_ARG=""
@@ -64,7 +72,7 @@ if [ ! -x "$DOTNET" ]; then
 fi
 
 echo "========================================"
-echo "  Image $APP_VERSION  发布打包"
+echo "  $APP_TITLE $APP_VERSION  发布打包"
 echo "  目标: $RID"
 if [ "$SMALL_MODE" = true ]; then
     echo "  模式: 体积优化 (--small)"
@@ -73,7 +81,7 @@ echo "========================================"
 echo ""
 
 # ---------- Step 1: dotnet publish ----------
-echo "[1/4] dotnet publish ..."
+echo "[1] dotnet publish ..."
 cd "$PROJECT_DIR"
 
 rm -rf "$OUTPUT_DIR/$RID"
@@ -106,7 +114,7 @@ if [ "$PLATFORM" = "osx" ]; then
     MACOS_DIR="$CONTENTS/MacOS"
     RES_DIR="$CONTENTS/Resources"
 
-    echo "[2/4] 创建 .app bundle ..."
+    echo "[2] 创建 .app bundle ..."
     rm -rf "$BUNDLE_DIR"
     mkdir -p "$MACOS_DIR"
     mkdir -p "$RES_DIR"
@@ -170,6 +178,7 @@ PYEOF
             fi
         fi
         rm -rf "$ICONSET_DIR"
+        rm -f "$OUTPUT_DIR/icon_from_ico.png"
     fi
 
     if [ "$ICON_OK" = true ]; then
@@ -183,7 +192,7 @@ PYEOF
         echo "        可执行: pip3 install --break-system-packages Pillow  然后重新打包。"
     fi
 
-    echo "[3/4] 写入 Info.plist ..."
+    echo "[3] 写入 Info.plist ..."
     cat > "$CONTENTS/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -236,7 +245,7 @@ PYEOF
 PLIST
 
     # ---------- Step 4: 创建带图标布局的 .dmg ----------
-    echo "[4/4] 创建 .dmg ..."
+    echo "[4] 创建 .dmg ..."
     DMG_OUT="$OUTPUT_DIR/$APP_TITLE-$APP_VERSION-$RID.dmg"
     rm -f "$DMG_OUT"
 
@@ -301,6 +310,7 @@ tell application "Finder"
 end tell
 EOF
     then
+        rm -f "$OSASCRIPT_LOG"
         : # 设置成功
     else
         echo ""
@@ -340,14 +350,67 @@ EOF
     echo "  .dmg : $DMG_OUT  ($DMG_SIZE)"
     echo "========================================"
 
-# ---------- Windows ----------
+# ---------- Windows: NSIS 安装包 ----------
 elif [ "$PLATFORM" = "win" ]; then
-    echo ""
-    echo "========================================"
-    echo "  发布完成 ✓"
-    echo "  目录: $OUTPUT_DIR/$RID/"
-    echo "  入口: $OUTPUT_DIR/$RID/$APP_NAME.exe"
-    echo "========================================"
+    NSISDIR="$ROOT_DIR/nsis-3.0.4.1"
+    PUBLISH_DIR="$OUTPUT_DIR/$RID"
+
+    # 检测 makensis：macOS 用 mac 子目录，Windows 用 Bin 子目录
+    if [ "$(uname -s)" = "Darwin" ]; then
+        MAKENSIS="$NSISDIR/mac/makensis"
+        # 清除 macOS 隔离属性，避免 "Killed: 9"
+        xattr -cr "$MAKENSIS" 2>/dev/null || true
+    else
+        MAKENSIS="$NSISDIR/Bin/makensis.exe"
+    fi
+
+    if [ ! -x "$MAKENSIS" ] && [ ! -f "$MAKENSIS" ]; then
+        echo ""
+        echo "========================================"
+        echo "  发布完成 ✓ (无 NSIS，跳过安装包)"
+        echo "  目录: $PUBLISH_DIR/"
+        echo "  入口: $PUBLISH_DIR/$APP_NAME.exe"
+        echo "========================================"
+        echo ""
+        echo "  提示: 未找到 makensis，请确认 nsis-3.0.4.1 目录完整。"
+        echo "        在此基础上可以在 Windows 上手动运行:"
+        echo "          makensis.exe /DAPP_VERSION=$APP_VERSION installer.nsi"
+        exit 0
+    fi
+
+    echo "[2] 生成 NSIS 安装包 ..."
+    NSIS_EXE="$OUTPUT_DIR/$APP_TITLE-$APP_VERSION-$RID.exe"
+
+    MAKE_NSIS_LOG="$OUTPUT_DIR/makensis.log"
+    NSISDIR="$NSISDIR" "$MAKENSIS" \
+        -DAPP_NAME="$APP_NAME" \
+        -DAPP_TITLE="$APP_TITLE" \
+        -DAPP_VERSION="$APP_VERSION" \
+        -DAPP_PUBLISHER="$APP_PUBLISHER" \
+        -DOUTPUT_DIR="$PUBLISH_DIR" \
+        -DICON_PATH="$ICON" \
+        -DLICENSE_PATH="$ROOT_DIR/LICENSE" \
+        "$SCRIPT_DIR/installer.nsi" > "$MAKE_NSIS_LOG" 2>&1
+
+    if [ -f "$NSIS_EXE" ]; then
+        EXE_SIZE=$(du -sh "$NSIS_EXE" | cut -f1)
+        echo ""
+        echo "========================================"
+        echo "  打包完成 ✓"
+        echo "  目录: $PUBLISH_DIR/"
+        echo "  安装包: $NSIS_EXE  ($EXE_SIZE)"
+        echo "========================================"
+        rm -f "$MAKE_NSIS_LOG"
+    else
+        echo ""
+        echo "========================================"
+        echo "  NSIS 打包失败 ✗"
+        echo "  目录: $PUBLISH_DIR/"
+        echo "  入口: $PUBLISH_DIR/$APP_NAME.exe"
+        echo "  日志: $MAKE_NSIS_LOG"
+        echo "========================================"
+        exit 1
+    fi
 
 # ---------- Linux ----------
 else

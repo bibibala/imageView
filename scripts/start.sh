@@ -5,10 +5,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-DOTNET="$SCRIPT_DIR/.dotnet/dotnet/dotnet"
-PROJECT_DIR="$SCRIPT_DIR/src"
+DOTNET="$ROOT_DIR/.dotnet/dotnet/dotnet"
+PROJECT_DIR="$ROOT_DIR/src"
 CONFIG="Debug"
 
 if [ "${1:-}" = "release" ] || [ "${1:-}" = "--release" ] || [ "${1:-}" = "-r" ]; then
@@ -28,7 +28,7 @@ fi
 cd "$PROJECT_DIR"
 
 echo "编译 ImageViewer ($CONFIG)..."
-export NUGET_PACKAGES="$PROJECT_DIR/../.packages"
+export NUGET_PACKAGES="$ROOT_DIR/.packages"
 "$DOTNET" build -c "$CONFIG"
 
 # 如果已有运行的 ImageViewer，先关闭再启动

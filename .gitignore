@@ -5,6 +5,7 @@
 # Build
 bin/
 obj/
+nsis-3.0.4.1
 
 # .NET SDK (bundled)
 .dotnet/

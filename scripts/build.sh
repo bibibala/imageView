@@ -5,10 +5,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
-DOTNET="$SCRIPT_DIR/.dotnet/dotnet/dotnet"
-PROJECT_DIR="$SCRIPT_DIR/src"
+DOTNET="$ROOT_DIR/.dotnet/dotnet/dotnet"
+PROJECT_DIR="$ROOT_DIR/src"
 CONFIG="Debug"
 CLEAN=false
 
