@@ -4,6 +4,8 @@
 
 基于 Avalonia 12 + .NET 10 构建。
 
+![preview](preview/preview.png)
+
 ## 开发
 
 ```bash
