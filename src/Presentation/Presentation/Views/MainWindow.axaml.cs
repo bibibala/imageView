@@ -32,6 +32,9 @@ public partial class MainWindow : Window
         AddHandler(PointerWheelChangedEvent, OnPointerWheelChanged);
         ImageScrollViewer.LayoutUpdated += OnScrollViewerLayoutUpdated;
 
+        ImageView.PointerMoved += OnImageViewPointerMoved;
+        ImageView.PointerExited += OnImageViewPointerExited;
+
         if (OperatingSystem.IsMacOS())
         {
             TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent };
@@ -65,6 +68,16 @@ public partial class MainWindow : Window
         if (e.PropertyName == nameof(MainViewModel.IsFullScreen) && sender is MainViewModel vm)
         {
             WindowState = vm.IsFullScreen ? WindowState.FullScreen : WindowState.Normal;
+        }
+        else if (e.PropertyName == nameof(MainViewModel.IsColorPickerActive) && sender is MainViewModel colorVm)
+        {
+            ImageView.Cursor = colorVm.IsColorPickerActive
+                ? new Cursor(StandardCursorType.Cross)
+                : Cursor.Default;
+
+            ColorPickerButton.Background = colorVm.IsColorPickerActive
+                ? Avalonia.Media.Brushes.DodgerBlue
+                : Avalonia.Media.Brushes.Transparent;
         }
     }
 
@@ -299,6 +312,14 @@ public partial class MainWindow : Window
                 ViewModel.ZoomOutCommand.Execute(null);
                 e.Handled = true;
                 break;
+            case Key.C:
+                if (ViewModel.IsColorPickerActive && !isMeta)
+                {
+                    var useRgb = e.KeyModifiers.HasFlag(KeyModifiers.Shift);
+                    _ = CopyColorToClipboardAsync(useRgb);
+                    e.Handled = true;
+                }
+                break;
         }
     }
 
@@ -329,6 +350,82 @@ public partial class MainWindow : Window
             }
 
             e.Handled = true;
+        }
+    }
+
+    private void OnImageViewPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!ViewModel.IsColorPickerActive || ViewModel.CurrentImage is null)
+        {
+            return;
+        }
+
+        var pos = e.GetPosition(ImageView);
+        var imagePixelW = ViewModel.CurrentImage.PixelSize.Width;
+        var imagePixelH = ViewModel.CurrentImage.PixelSize.Height;
+        if (imagePixelW <= 0 || imagePixelH <= 0)
+        {
+            return;
+        }
+
+        var viewW = ImageView.Bounds.Width;
+        var viewH = ImageView.Bounds.Height;
+        if (viewW <= 0 || viewH <= 0)
+        {
+            return;
+        }
+
+        // 计算 Stretch=Uniform 后的实际渲染区域
+        var ratio = Math.Min(viewW / imagePixelW, viewH / imagePixelH);
+        var renderW = imagePixelW * ratio;
+        var renderH = imagePixelH * ratio;
+        var offsetX = (viewW - renderW) / 2;
+        var offsetY = (viewH - renderH) / 2;
+
+        // 检查鼠标是否在图片渲染区域内
+        if (pos.X < offsetX || pos.X > offsetX + renderW ||
+            pos.Y < offsetY || pos.Y > offsetY + renderH)
+        {
+            ViewModel.ClearColorPicker();
+            return;
+        }
+
+        var pixelX = (int)((pos.X - offsetX) / ratio);
+        var pixelY = (int)((pos.Y - offsetY) / ratio);
+        ViewModel.UpdateColorPicker(pixelX, pixelY);
+        ViewModel.UpdateMagnifier(pixelX, pixelY);
+
+        // 定位放大镜到鼠标右上角
+        var panelPos = e.GetPosition(ImagePanel);
+        MagnifierBorder.Margin = new Thickness(panelPos.X + 16, panelPos.Y - MagnifierBorder.Height - 12, 0, 0);
+    }
+
+    private void OnImageViewPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (ViewModel.IsColorPickerActive)
+        {
+            ViewModel.ClearColorPicker();
+        }
+    }
+
+    private async Task CopyColorToClipboardAsync(bool useRgb = false)
+    {
+        if (ViewModel.ColorPickerHex == "—")
+        {
+            return;
+        }
+
+        var text = useRgb ? ViewModel.ColorPickerRgb : ViewModel.ColorPickerHex;
+        if (string.IsNullOrEmpty(text) || text == "—")
+        {
+            return;
+        }
+
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+        if (clipboard is not null)
+        {
+            await clipboard.SetTextAsync(text);
+            ViewModel.ShowCopiedFeedback();
         }
     }
 

@@ -68,7 +68,7 @@
                         Click="OnTabClick">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="⚙" FontSize="16" />
-                        <TextBlock Text="通用设置" />
+                        <TextBlock Text="{loc:Loc GeneralTab}" />
                     </StackPanel>
                 </Button>
                 <Button Classes="tab-btn"
@@ -76,7 +76,15 @@
                         Click="OnTabClick">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBlock Text="ℹ" FontSize="16" />
-                        <TextBlock Text="关于" />
+                        <TextBlock Text="{loc:Loc About}" />
+                    </StackPanel>
+                </Button>
+                <Button Classes="tab-btn"
+                        x:Name="ShortcutsTabBtn"
+                        Click="OnTabClick">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⌨" FontSize="16" />
+                        <TextBlock Text="{loc:Loc ShortcutsTab}" />
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -145,7 +153,7 @@
                                     Opacity="0.2" />
 
                             <StackPanel Spacing="8">
-                                <TextBlock Text="作者"
+                                <TextBlock Text="{loc:Loc Author}"
                                            FontWeight="Bold"
                                            FontSize="14" />
                                 <Button Classes="link-btn"
@@ -154,12 +162,47 @@
                             </StackPanel>
 
                             <StackPanel Spacing="8">
-                                <TextBlock Text="仓库"
+                                <TextBlock Text="{loc:Loc Repository}"
                                            FontWeight="Bold"
                                            FontSize="14" />
                                 <Button Classes="link-btn"
                                         Content="github.com/bibibala/imageView"
                                         Click="OnOpenRepoUrl" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- 快捷键 -->
+                <StackPanel x:Name="ShortcutsPanel" IsVisible="False">
+                    <Border Classes="setting-card">
+                        <StackPanel Spacing="16">
+                            <TextBlock Classes="setting-title" Text="{loc:Loc ColorPicker}" />
+                            <StackPanel Spacing="12">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                            CornerRadius="4"
+                                            Padding="6,3">
+                                        <TextBlock Text="C"
+                                                   FontSize="12"
+                                                   FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Loc CopyColorHexDesc}"
+                                               VerticalAlignment="Center"
+                                               FontSize="13" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                            CornerRadius="4"
+                                            Padding="6,3">
+                                        <TextBlock Text="⇧ C"
+                                                   FontSize="12"
+                                                   FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="{loc:Loc CopyColorRgbDesc}"
+                                               VerticalAlignment="Center"
+                                               FontSize="13" />
+                                </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>

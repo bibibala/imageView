@@ -11,8 +11,10 @@ public partial class SettingsView : Window
 {
     private Button? _generalTabBtn;
     private Button? _aboutTabBtn;
+    private Button? _shortcutsTabBtn;
     private StackPanel? _generalPanel;
     private StackPanel? _aboutPanel;
+    private StackPanel? _shortcutsPanel;
 
     private const string AuthorUrl = "https://github.com/bibibala";
     private const string RepoUrl = "https://github.com/bibibala/imageView";
@@ -32,31 +34,29 @@ public partial class SettingsView : Window
     {
         _generalTabBtn = this.FindControl<Button>("GeneralTabBtn");
         _aboutTabBtn = this.FindControl<Button>("AboutTabBtn");
+        _shortcutsTabBtn = this.FindControl<Button>("ShortcutsTabBtn");
         _generalPanel = this.FindControl<StackPanel>("GeneralPanel");
         _aboutPanel = this.FindControl<StackPanel>("AboutPanel");
+        _shortcutsPanel = this.FindControl<StackPanel>("ShortcutsPanel");
     }
 
     private void OnTabClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn || _generalTabBtn is null || _aboutTabBtn is null || _generalPanel is null || _aboutPanel is null)
+        if (sender is not Button btn
+            || _generalTabBtn is null || _aboutTabBtn is null || _shortcutsTabBtn is null
+            || _generalPanel is null || _aboutPanel is null || _shortcutsPanel is null)
         {
             return;
         }
 
         _generalTabBtn.Classes.Remove("active");
         _aboutTabBtn.Classes.Remove("active");
+        _shortcutsTabBtn.Classes.Remove("active");
         btn.Classes.Add("active");
 
-        if (btn == _generalTabBtn)
-        {
-            _generalPanel.IsVisible = true;
-            _aboutPanel.IsVisible = false;
-        }
-        else
-        {
-            _generalPanel.IsVisible = false;
-            _aboutPanel.IsVisible = true;
-        }
+        _generalPanel.IsVisible = btn == _generalTabBtn;
+        _aboutPanel.IsVisible = btn == _aboutTabBtn;
+        _shortcutsPanel.IsVisible = btn == _shortcutsTabBtn;
     }
 
     private void OnOpenAuthorUrl(object? sender, RoutedEventArgs e)

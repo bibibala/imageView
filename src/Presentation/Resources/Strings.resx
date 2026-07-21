@@ -175,4 +175,37 @@
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
+  <data name="ColorPicker" xml:space="preserve">
+    <value>Color Picker</value>
+  </data>
+  <data name="GeneralTab" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="ShortcutsTab" xml:space="preserve">
+    <value>Shortcuts</value>
+  </data>
+  <data name="CopyColorHexDesc" xml:space="preserve">
+    <value>Copy color (HEX)</value>
+  </data>
+  <data name="CopyColorRgbDesc" xml:space="preserve">
+    <value>Copy color (RGB)</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="Repository" xml:space="preserve">
+    <value>Repository</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="CopiedFeedback" xml:space="preserve">
+    <value>Copied ✓</value>
+  </data>
 </root>

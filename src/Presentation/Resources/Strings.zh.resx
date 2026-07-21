@@ -175,4 +175,37 @@
   <data name="Confirm" xml:space="preserve">
     <value>确定</value>
   </data>
+  <data name="ColorPicker" xml:space="preserve">
+    <value>取色器</value>
+  </data>
+  <data name="GeneralTab" xml:space="preserve">
+    <value>通用设置</value>
+  </data>
+  <data name="ShortcutsTab" xml:space="preserve">
+    <value>快捷键</value>
+  </data>
+  <data name="CopyColorHexDesc" xml:space="preserve">
+    <value>复制颜色（HEX）</value>
+  </data>
+  <data name="CopyColorRgbDesc" xml:space="preserve">
+    <value>复制颜色（RGB）</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>作者</value>
+  </data>
+  <data name="Repository" xml:space="preserve">
+    <value>仓库</value>
+  </data>
+  <data name="ThemeSystem" xml:space="preserve">
+    <value>跟随系统</value>
+  </data>
+  <data name="ThemeLight" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="CopiedFeedback" xml:space="preserve">
+    <value>已复制 ✓</value>
+  </data>
 </root>

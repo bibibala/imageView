@@ -26,15 +26,12 @@ public partial class SettingsViewModel : ViewModelBase
         new LanguageOption("en", "English")
     };
 
-    public ObservableCollection<string> ThemeOptions { get; } = new()
-    {
-        "系统",
-        "浅色",
-        "深色"
-    };
+    public ObservableCollection<string> ThemeOptions { get; } = new();
 
     [ObservableProperty]
-    private string _selectedTheme = "系统";
+    private string _selectedTheme = string.Empty;
+
+    private bool _isInitializing;
 
     public SettingsViewModel(ILocalizationService localizationService, ISettingsService settingsService, ILogger<SettingsViewModel> logger)
     {
@@ -42,19 +39,29 @@ public partial class SettingsViewModel : ViewModelBase
         _settingsService = settingsService;
         _logger = logger;
 
+        _isInitializing = true;
+
+        ThemeOptions.Add(localizationService.GetString("ThemeSystem"));
+        ThemeOptions.Add(localizationService.GetString("ThemeLight"));
+        ThemeOptions.Add(localizationService.GetString("ThemeDark"));
+
         SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Code == _localizationService.CurrentLanguageCode);
         
         var theme = _settingsService.Theme;
-        SelectedTheme = theme switch
+        var themeIndex = theme switch
         {
-            "Light" => "浅色",
-            "Dark" => "深色",
-            _ => "系统"
+            "Light" => 1,
+            "Dark" => 2,
+            _ => 0
         };
+        SelectedTheme = ThemeOptions[themeIndex];
+
+        _isInitializing = false;
     }
 
     partial void OnSelectedLanguageChanged(LanguageOption? value)
     {
+        if (_isInitializing) return;
         if (value is not null && value.Code != _localizationService.CurrentLanguageCode)
         {
             _localizationService.SetLanguage(value.Code);
@@ -64,10 +71,12 @@ public partial class SettingsViewModel : ViewModelBase
 
     partial void OnSelectedThemeChanged(string value)
     {
-        var theme = value switch
+        if (_isInitializing) return;
+        var index = ThemeOptions.IndexOf(value);
+        var theme = index switch
         {
-            "浅色" => "Light",
-            "深色" => "Dark",
+            1 => "Light",
+            2 => "Dark",
             _ => "System"
         };
         _settingsService.SetTheme(theme);
