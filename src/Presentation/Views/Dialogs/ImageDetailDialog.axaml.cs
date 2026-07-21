@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.IO;
 
-namespace ImageViewer.Presentation.Views;
+namespace ImageViewer.Presentation.Views.Dialogs;
 
-public partial class ImageDetailView : Window
+public partial class ImageDetailDialog : Window
 {
     private static readonly Dictionary<string, string> ExifNameZh = new()
     {
@@ -114,17 +114,18 @@ public partial class ImageDetailView : Window
         ["WebP"] = "WebP 信息",
     };
 
-    public ImageDetailView()
+    public ImageDetailDialog()
     {
         InitializeComponent();
     }
 
-    public ImageDetailView(ImageItem item, PixelSize pixelSize) : this()
+    public ImageDetailDialog(ImageItem item, PixelSize pixelSize) : this()
     {
         var ext = Path.GetExtension(item.FileName).TrimStart('.').ToUpperInvariant();
         if (string.IsNullOrEmpty(ext))
         {
-            ext = "未知";
+            var locService = App.Services.GetRequiredService<ILocalizationService>();
+            ext = locService.GetString("UnknownLabel");
         }
 
         FileNameText.Text = item.FileName;

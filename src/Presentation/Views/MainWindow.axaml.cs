@@ -9,6 +9,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ImageViewer.AppServices.Interfaces;
 using ImageViewer.Presentation.ViewModels;
+using ImageViewer.Presentation.Views.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 
@@ -191,7 +192,7 @@ public partial class MainWindow : Window
     private void OnSettingsClick(object? sender, RoutedEventArgs e)
     {
         var viewModel = App.Services.GetRequiredService<SettingsViewModel>();
-        var settingsWindow = new SettingsView(viewModel);
+        var settingsWindow = new SettingsDialog(viewModel);
         settingsWindow.ShowDialog(this);
     }
 
@@ -202,7 +203,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        var detailView = new ImageDetailView(ViewModel.CurrentItem, ViewModel.CurrentImage.PixelSize);
+        var detailView = new ImageDetailDialog(ViewModel.CurrentItem, ViewModel.CurrentImage.PixelSize);
         detailView.ShowDialog(this);
     }
 

@@ -59,153 +59,180 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppTitle" xml:space="preserve">
-    <value>图片查看器</value>
+    <value>Image Viewer</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>关闭</value>
+    <value>Close</value>
   </data>
   <data name="Minimize" xml:space="preserve">
-    <value>最小化</value>
+    <value>Minimize</value>
   </data>
   <data name="Maximize" xml:space="preserve">
-    <value>最大化</value>
+    <value>Maximize</value>
   </data>
   <data name="OpenImage" xml:space="preserve">
-    <value>打开图片</value>
+    <value>Open Image</value>
   </data>
   <data name="OpenFolder" xml:space="preserve">
-    <value>打开文件夹</value>
+    <value>Open Folder</value>
   </data>
   <data name="ToggleTheme" xml:space="preserve">
-    <value>切换主题</value>
+    <value>Toggle Theme</value>
   </data>
   <data name="FullScreen" xml:space="preserve">
-    <value>全屏</value>
+    <value>Full Screen</value>
   </data>
   <data name="RotateClockwise" xml:space="preserve">
-    <value>右旋90°</value>
+    <value>Rotate Clockwise</value>
   </data>
   <data name="RotateCounterClockwise" xml:space="preserve">
-    <value>左旋90°</value>
+    <value>Rotate Counter-Clockwise</value>
   </data>
   <data name="ZoomIn" xml:space="preserve">
-    <value>放大</value>
+    <value>Zoom In</value>
   </data>
   <data name="ZoomOut" xml:space="preserve">
-    <value>缩小</value>
+    <value>Zoom Out</value>
   </data>
   <data name="Reset" xml:space="preserve">
-    <value>重置</value>
+    <value>Reset</value>
   </data>
   <data name="Previous" xml:space="preserve">
-    <value>上一张</value>
+    <value>Previous</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>下一张</value>
+    <value>Next</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>设置</value>
+    <value>Settings</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>语言</value>
+    <value>Language</value>
   </data>
   <data name="OpenImagePrompt" xml:space="preserve">
-    <value>拖入图片或点击工具栏打开</value>
+    <value>Drop an image or click the toolbar to open</value>
   </data>
   <data name="StatusOpenImageOrFolder" xml:space="preserve">
-    <value>请打开图片或文件夹</value>
+    <value>Open an image or folder</value>
   </data>
   <data name="StatusFolderNotFound" xml:space="preserve">
-    <value>文件夹不存在</value>
+    <value>Folder not found</value>
   </data>
   <data name="StatusNoSupportedImages" xml:space="preserve">
-    <value>该文件夹下未找到支持的图片</value>
+    <value>No supported images found in this folder</value>
   </data>
   <data name="StatusCannotLoadImage" xml:space="preserve">
-    <value>无法加载图片</value>
+    <value>Cannot load image</value>
   </data>
   <data name="StatusLoadFailed" xml:space="preserve">
-    <value>加载失败: {0}</value>
+    <value>Failed to load: {0}</value>
   </data>
   <data name="StatusReset" xml:space="preserve">
-    <value>已重置</value>
+    <value>Reset</value>
   </data>
   <data name="StatusZoom" xml:space="preserve">
-    <value>缩放: {0}%</value>
+    <value>Zoom: {0}%</value>
   </data>
   <data name="StatusImageInfo" xml:space="preserve">
     <value>{0} / {1} - {2} - {3}</value>
   </data>
   <data name="FilePickerImage" xml:space="preserve">
-    <value>图片</value>
+    <value>Image</value>
   </data>
   <data name="PickerTitleOpenImage" xml:space="preserve">
-    <value>选择图片</value>
+    <value>Select Image</value>
   </data>
   <data name="PickerTitleOpenFolder" xml:space="preserve">
-    <value>选择文件夹</value>
+    <value>Select Folder</value>
   </data>
   <data name="Appearance" xml:space="preserve">
-    <value>外观</value>
+    <value>Appearance</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>主题</value>
+    <value>Theme</value>
   </data>
   <data name="DisplayLanguage" xml:space="preserve">
-    <value>显示语言</value>
+    <value>Display Language</value>
   </data>
   <data name="About" xml:space="preserve">
-    <value>关于</value>
+    <value>About</value>
   </data>
   <data name="ImageDetail" xml:space="preserve">
-    <value>图片详情</value>
+    <value>Image Detail</value>
   </data>
   <data name="Delete" xml:space="preserve">
-    <value>删除</value>
+    <value>Delete</value>
   </data>
   <data name="ConfirmDelete" xml:space="preserve">
-    <value>确认删除</value>
+    <value>Confirm Delete</value>
   </data>
   <data name="ConfirmDeleteMessage" xml:space="preserve">
-    <value>确定要删除此图片吗？此操作不可撤销。</value>
+    <value>Are you sure you want to delete this image? This action cannot be undone.</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>取消</value>
+    <value>Cancel</value>
   </data>
   <data name="Confirm" xml:space="preserve">
-    <value>确定</value>
+    <value>Confirm</value>
   </data>
   <data name="ColorPicker" xml:space="preserve">
-    <value>取色器</value>
+    <value>Color Picker</value>
   </data>
   <data name="GeneralTab" xml:space="preserve">
-    <value>通用设置</value>
+    <value>General</value>
   </data>
   <data name="ShortcutsTab" xml:space="preserve">
-    <value>快捷键</value>
+    <value>Shortcuts</value>
   </data>
   <data name="CopyColorHexDesc" xml:space="preserve">
-    <value>复制颜色（HEX）</value>
+    <value>Copy color (HEX)</value>
   </data>
   <data name="CopyColorRgbDesc" xml:space="preserve">
-    <value>复制颜色（RGB）</value>
+    <value>Copy color (RGB)</value>
   </data>
   <data name="Author" xml:space="preserve">
-    <value>作者</value>
+    <value>Author</value>
   </data>
   <data name="Repository" xml:space="preserve">
-    <value>仓库</value>
+    <value>Repository</value>
   </data>
   <data name="ThemeSystem" xml:space="preserve">
-    <value>跟随系统</value>
+    <value>System</value>
   </data>
   <data name="ThemeLight" xml:space="preserve">
-    <value>浅色</value>
+    <value>Light</value>
   </data>
   <data name="ThemeDark" xml:space="preserve">
-    <value>深色</value>
+    <value>Dark</value>
   </data>
   <data name="CopiedFeedback" xml:space="preserve">
-    <value>已复制 ✓</value>
+    <value>Copied ✓</value>
+  </data>
+  <data name="FileNameLabel" xml:space="preserve">
+    <value>File Name</value>
+  </data>
+  <data name="FormatLabel" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="ImageDimensionsLabel" xml:space="preserve">
+    <value>Dimensions</value>
+  </data>
+  <data name="FileSizeLabel" xml:space="preserve">
+    <value>File Size</value>
+  </data>
+  <data name="ModifiedTimeLabel" xml:space="preserve">
+    <value>Modified</value>
+  </data>
+  <data name="FilePathLabel" xml:space="preserve">
+    <value>File Path</value>
+  </data>
+  <data name="ExifInfoLabel" xml:space="preserve">
+    <value>EXIF Info</value>
+  </data>
+  <data name="NoExifDataLabel" xml:space="preserve">
+    <value>No EXIF data</value>
+  </data>
+  <data name="UnknownLabel" xml:space="preserve">
+    <value>Unknown</value>
   </data>
 </root>

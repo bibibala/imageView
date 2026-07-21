@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ImageViewer.Presentation.ViewModels"
         xmlns:loc="using:ImageViewer.Presentation.MarkupExtensions"
-        x:Class="ImageViewer.Presentation.Views.SettingsView"
+        x:Class="ImageViewer.Presentation.Views.Dialogs.SettingsDialog"
         x:DataType="vm:SettingsViewModel"
         Title="{loc:Loc Settings}"
         Width="520"
@@ -142,7 +142,7 @@
                                     <TextBlock Text="Image Viewer"
                                                FontSize="20"
                                                FontWeight="Bold" />
-                                    <TextBlock Text="Version 1.0.0"
+                                    <TextBlock Text="Version 1.1.0"
                                                Opacity="0.6"
                                                Margin="0,4,0,0" />
                                 </StackPanel>

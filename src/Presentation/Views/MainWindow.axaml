@@ -135,10 +135,10 @@
 
                         <Border Classes="sidebar-separator" />
 
-                        <Button Classes="sidebar-btn" Content="🔎" Command="{Binding ZoomOutCommand}"
-                                ToolTip.Tip="{loc:Loc ZoomOut}" />
-                        <Button Classes="sidebar-btn" Content="🔍" Command="{Binding ZoomInCommand}"
+                        <Button Classes="sidebar-btn" Content="🔎" Command="{Binding ZoomInCommand}"
                                 ToolTip.Tip="{loc:Loc ZoomIn}" />
+                        <Button Classes="sidebar-btn" Content="🔍" Command="{Binding ZoomOutCommand}"
+                                ToolTip.Tip="{loc:Loc ZoomOut}" />
                         <Button Classes="sidebar-btn" Content="🔄" Command="{Binding ResetTransformCommand}"
                                 ToolTip.Tip="{loc:Loc Reset}" />
 

@@ -5,9 +5,9 @@ using Avalonia.Markup.Xaml;
 using ImageViewer.Presentation.ViewModels;
 using System.Diagnostics;
 
-namespace ImageViewer.Presentation.Views;
+namespace ImageViewer.Presentation.Views.Dialogs;
 
-public partial class SettingsView : Window
+public partial class SettingsDialog : Window
 {
     private Button? _generalTabBtn;
     private Button? _aboutTabBtn;
@@ -19,12 +19,12 @@ public partial class SettingsView : Window
     private const string AuthorUrl = "https://github.com/bibibala";
     private const string RepoUrl = "https://github.com/bibibala/imageView";
 
-    public SettingsView()
+    public SettingsDialog()
     {
         InitializeComponent();
     }
 
-    public SettingsView(SettingsViewModel viewModel) : this()
+    public SettingsDialog(SettingsViewModel viewModel) : this()
     {
         DataContext = viewModel;
         Loaded += OnLoaded;

@@ -18,7 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 DOTNET="$SCRIPT_DIR/.dotnet/dotnet/dotnet"
-PROJECT_DIR="$SCRIPT_DIR/src/Presentation"
+PROJECT_DIR="$SCRIPT_DIR/src"
 ICON="$PROJECT_DIR/Assets/icon.ico"
 ICNS_SOURCE="$PROJECT_DIR/Assets/icon.icns"
 

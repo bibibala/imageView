@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace ImageViewer.Presentation.Views;
+namespace ImageViewer.Presentation.Views.Dialogs;
 
 public partial class ConfirmDialog : Window
 {

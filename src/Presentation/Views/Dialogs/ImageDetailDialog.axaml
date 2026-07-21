@@ -1,8 +1,9 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:views="using:ImageViewer.Presentation.Views"
-        x:Class="ImageViewer.Presentation.Views.ImageDetailView"
-        Title="图片详情"
+        xmlns:views="using:ImageViewer.Presentation.Views.Dialogs"
+        xmlns:loc="using:ImageViewer.Presentation.MarkupExtensions"
+        x:Class="ImageViewer.Presentation.Views.Dialogs.ImageDetailDialog"
+        Title="{loc:Loc ImageDetail}"
         Width="480"
         Height="560"
         WindowStartupLocation="CenterOwner">
@@ -39,32 +40,32 @@
         <StackPanel Spacing="0">
             <!-- 基本信息 -->
             <StackPanel>
-                <TextBlock Classes="label" Text="文件名" />
+                <TextBlock Classes="label" Text="{loc:Loc FileNameLabel}" />
                 <TextBlock x:Name="FileNameText" Classes="value" />
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Classes="label" Text="格式" />
+                <TextBlock Classes="label" Text="{loc:Loc FormatLabel}" />
                 <TextBlock x:Name="FormatText" Classes="value" />
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Classes="label" Text="图片尺寸" />
+                <TextBlock Classes="label" Text="{loc:Loc ImageDimensionsLabel}" />
                 <TextBlock x:Name="DimensionText" Classes="value" />
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Classes="label" Text="文件大小" />
+                <TextBlock Classes="label" Text="{loc:Loc FileSizeLabel}" />
                 <TextBlock x:Name="FileSizeText" Classes="value" />
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Classes="label" Text="修改时间" />
+                <TextBlock Classes="label" Text="{loc:Loc ModifiedTimeLabel}" />
                 <TextBlock x:Name="ModifiedTimeText" Classes="value" />
             </StackPanel>
 
             <StackPanel>
-                <TextBlock Classes="label" Text="文件路径" />
+                <TextBlock Classes="label" Text="{loc:Loc FilePathLabel}" />
                 <TextBlock x:Name="FilePathText" Classes="value" />
             </StackPanel>
 
@@ -75,13 +76,13 @@
                     Margin="0,16,0,8" />
 
             <!-- EXIF 信息 -->
-            <TextBlock Text="EXIF 信息"
+            <TextBlock Text="{loc:Loc ExifInfoLabel}"
                        FontWeight="Bold"
                        FontSize="16"
                        Margin="0,0,0,4" />
 
             <TextBlock x:Name="NoExifText"
-                       Text="无 EXIF 数据"
+                       Text="{loc:Loc NoExifDataLabel}"
                        Opacity="0.5"
                        FontSize="13" />
 
