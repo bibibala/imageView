@@ -145,4 +145,34 @@
   <data name="PickerTitleOpenFolder" xml:space="preserve">
     <value>选择文件夹</value>
   </data>
+  <data name="Appearance" xml:space="preserve">
+    <value>外观</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="DisplayLanguage" xml:space="preserve">
+    <value>显示语言</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="ImageDetail" xml:space="preserve">
+    <value>图片详情</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="ConfirmDelete" xml:space="preserve">
+    <value>确认删除</value>
+  </data>
+  <data name="ConfirmDeleteMessage" xml:space="preserve">
+    <value>确定要删除此图片吗？此操作不可撤销。</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>确定</value>
+  </data>
 </root>

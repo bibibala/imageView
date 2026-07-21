@@ -20,7 +20,7 @@
     <Window.Styles>
         <Style Selector="Border.title-bar">
             <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
-            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="Padding" Value="16,0,16,0" />
             <Setter Property="Height" Value="40" />
         </Style>
         <Style Selector="Button.traffic-light">
@@ -29,7 +29,7 @@
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="Margin" Value="0,0,6,0" />
         </Style>
         <Style Selector="Button.close-btn">
             <Setter Property="Background" Value="#FF5F57" />
@@ -44,18 +44,52 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Opacity" Value="0.8" />
         </Style>
-        <Style Selector="Button.tool-btn">
-            <Setter Property="Width" Value="28" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="FontSize" Value="14" />
+        <Style Selector="Border.sidebar">
+            <Setter Property="Width" Value="72" />
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumBrush}" />
+            <Setter Property="Padding" Value="12,0" />
+        </Style>
+        <Style Selector="Button.sidebar-btn">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="FontSize" Value="16" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Margin" Value="0,4" />
         </Style>
-        <Style Selector="Button.tool-btn:pointerover">
+        <Style Selector="Button.sidebar-btn:pointerover">
             <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAltListLowBrush}" />
+        </Style>
+        <Style Selector="Button.sidebar-btn:disabled">
+            <Setter Property="Opacity" Value="0.35" />
+        </Style>
+        <Style Selector="Button.nav-btn:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.nav-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Border.sidebar-separator">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+            <Setter Property="Opacity" Value="0.2" />
+            <Setter Property="Margin" Value="0,8" />
+        </Style>
+        <Style Selector="MenuFlyoutPresenter">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="MinWidth" Value="140" />
+        </Style>
+        <Style Selector="MenuFlyoutPresenter MenuItem">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="CornerRadius" Value="6" />
         </Style>
     </Window.Styles>
 
@@ -72,99 +106,155 @@
     <Border BorderBrush="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
             BorderThickness="1"
             CornerRadius="16"
-            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+            ClipToBounds="True"
+            PointerPressed="OnWindowPointerPressed">
         <DockPanel LastChildFill="True">
 
-            <!-- 自定义标题栏 -->
-            <Border DockPanel.Dock="Top"
-                    Classes="title-bar"
-                    PointerPressed="OnTitleBarPointerPressed">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <!-- 左侧：macOS 交通灯按钮 -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <!-- 左侧边栏（交通灯 + 工具按钮） -->
+            <Border DockPanel.Dock="Left" Classes="sidebar">
+                <Grid RowDefinitions="Auto,Auto,*,Auto">
+                    <!-- 交通灯 -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,16,0,8">
                         <Button Classes="traffic-light close-btn" Click="OnCloseClick" ToolTip.Tip="{loc:Loc Close}" />
                         <Button Classes="traffic-light minimize-btn" Click="OnMinimizeClick" ToolTip.Tip="{loc:Loc Minimize}" />
                         <Button Classes="traffic-light maximize-btn" Click="OnMaximizeClick" ToolTip.Tip="{loc:Loc Maximize}" />
                     </StackPanel>
 
-                    <!-- 右侧工具按钮 -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Button Classes="tool-btn" Content="📁" Click="OnOpenFileClick" ToolTip.Tip="{loc:Loc OpenImage}" />
-                        <Button Classes="tool-btn" Content="📂" Click="OnOpenFolderClick" ToolTip.Tip="{loc:Loc OpenFolder}" />
-                        <Button Classes="tool-btn" Content="◐" Command="{Binding ToggleThemeCommand}"
-                                ToolTip.Tip="{loc:Loc ToggleTheme}" />
-                        <Button Classes="tool-btn" Content="⛶" Command="{Binding ToggleFullScreenCommand}"
-                                ToolTip.Tip="{loc:Loc FullScreen}" />
-                        <Button Classes="tool-btn" Content="↻" Command="{Binding RotateClockwiseCommand}"
-                                ToolTip.Tip="{loc:Loc RotateClockwise}" />
-                        <Button Classes="tool-btn" Content="↺" Command="{Binding RotateCounterClockwiseCommand}"
-                                ToolTip.Tip="{loc:Loc RotateCounterClockwise}" />
-                        <Button Classes="tool-btn" Content="+" Command="{Binding ZoomInCommand}"
-                                ToolTip.Tip="{loc:Loc ZoomIn}" />
-                        <Button Classes="tool-btn" Content="−" Command="{Binding ZoomOutCommand}"
+                    <Border Grid.Row="1" Classes="sidebar-separator" HorizontalAlignment="Center" />
+
+                    <!-- 顶部工具区 -->
+                    <StackPanel Grid.Row="2" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <Button Classes="sidebar-btn" Content="📂" Click="OnOpenFolderClick" ToolTip.Tip="{loc:Loc OpenFolder}" />
+
+                        <Border Classes="sidebar-separator" />
+
+                        <Button Classes="sidebar-btn" Content="−" Command="{Binding ZoomOutCommand}"
                                 ToolTip.Tip="{loc:Loc ZoomOut}" />
-                        <Button Classes="tool-btn" Content="🗗" Command="{Binding ResetTransformCommand}"
+                        <Button Classes="sidebar-btn" Content="+" Command="{Binding ZoomInCommand}"
+                                ToolTip.Tip="{loc:Loc ZoomIn}" />
+                        <Button Classes="sidebar-btn" Content="🗖" Command="{Binding ResetTransformCommand}"
                                 ToolTip.Tip="{loc:Loc Reset}" />
-                        <Button Classes="tool-btn" Content="◀" Command="{Binding PreviousCommand}"
-                                IsEnabled="{Binding CanGoPrevious}" ToolTip.Tip="{loc:Loc Previous}" />
-                        <Button Classes="tool-btn" Content="▶" Command="{Binding NextCommand}"
-                                IsEnabled="{Binding CanGoNext}" ToolTip.Tip="{loc:Loc Next}" />
-                        <Button Classes="tool-btn" Content="⚙" ToolTip.Tip="{loc:Loc Settings}">
-                            <Button.Flyout>
-                                <Flyout Placement="Bottom">
-                                    <Border Padding="12" Width="220">
-                                        <StackPanel Spacing="8">
-                                            <TextBlock Text="{loc:Loc Language}" FontWeight="Medium" />
-                                            <ComboBox ItemsSource="{Binding LanguageOptions}"
-                                                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
-                                                      HorizontalAlignment="Stretch">
-                                                <ComboBox.ItemTemplate>
-                                                    <DataTemplate DataType="vm:LanguageOption">
-                                                        <TextBlock Text="{Binding DisplayName}" />
-                                                    </DataTemplate>
-                                                </ComboBox.ItemTemplate>
-                                            </ComboBox>
-                                        </StackPanel>
-                                    </Border>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
+
+                        <Border Classes="sidebar-separator" />
+
+                        <Button Classes="sidebar-btn" Content="↺" Command="{Binding RotateCounterClockwiseCommand}"
+                                ToolTip.Tip="{loc:Loc RotateCounterClockwise}" />
+                        <Button Classes="sidebar-btn" Content="↻" Command="{Binding RotateClockwiseCommand}"
+                                ToolTip.Tip="{loc:Loc RotateClockwise}" />
+
+
+                    </StackPanel>
+
+                    <!-- 底部设置区 -->
+                    <StackPanel Grid.Row="3" HorizontalAlignment="Center" Margin="0,0,0,12">
+                        <Button Classes="sidebar-btn" Content="⚙" Click="OnSettingsClick" ToolTip.Tip="{loc:Loc Settings}" />
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <Border DockPanel.Dock="Bottom"
-                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-                    Padding="12,4">
-                <TextBlock Text="{Binding StatusMessage}" />
+            <!-- 主体内容区（占满右侧剩余空间） -->
+            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    CornerRadius="0,16,16,0"
+                    ClipToBounds="True">
+                <Border.ContextFlyout>
+                    <MenuFlyout>
+                        <MenuItem Header="{loc:Loc ImageDetail}"
+                                  Click="OnImageDetailClick"
+                                  IsVisible="{Binding HasImage}" />
+                        <MenuItem Header="{loc:Loc Delete}"
+                                  Foreground="#E74856"
+                                  Click="OnDeleteImageClick"
+                                  IsVisible="{Binding HasImage}" />
+                    </MenuFlyout>
+                </Border.ContextFlyout>
+                <Panel>
+                    <ScrollViewer x:Name="ImageScrollViewer"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  IsVisible="{Binding HasImage}">
+                        <LayoutTransformControl HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <LayoutTransformControl.LayoutTransform>
+                                <TransformGroup>
+                                    <RotateTransform Angle="{Binding Rotation}" />
+                                    <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+                                </TransformGroup>
+                            </LayoutTransformControl.LayoutTransform>
+                            <Image x:Name="ImageView"
+                                   Source="{Binding CurrentImage}"
+                                   Stretch="Uniform"
+                                   StretchDirection="DownOnly" />
+                        </LayoutTransformControl>
+                    </ScrollViewer>
+
+                    <TextBlock Text="{loc:Loc OpenImagePrompt}"
+                               Foreground="#888"
+                               FontSize="16"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding !HasImage}" />
+
+                    <Button Classes="nav-btn"
+                            Command="{Binding PreviousCommand}"
+                            IsEnabled="{Binding CanGoPrevious}"
+                            Margin="8"
+                            Width="44"
+                            Height="44"
+                            Padding="0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Opacity="0.8"
+                            IsVisible="{Binding HasImage}">
+                        <TextBlock Text="◀"
+                                   FontSize="20"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Effect>
+                                <DropShadowEffect BlurRadius="6"
+                                                  OffsetX="0"
+                                                  OffsetY="0"
+                                                  Color="#B0000000"
+                                                  Opacity="0.8" />
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Button>
+
+                    <Button Classes="nav-btn"
+                            Command="{Binding NextCommand}"
+                            IsEnabled="{Binding CanGoNext}"
+                            Margin="8"
+                            Width="44"
+                            Height="44"
+                            Padding="0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Opacity="0.8"
+                            IsVisible="{Binding HasImage}">
+                        <TextBlock Text="▶"
+                                   FontSize="20"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                            <TextBlock.Effect>
+                                <DropShadowEffect BlurRadius="6"
+                                                  OffsetX="0"
+                                                  OffsetY="0"
+                                                  Color="#B0000000"
+                                                  Opacity="0.8" />
+                            </TextBlock.Effect>
+                        </TextBlock>
+                    </Button>
+                </Panel>
             </Border>
-
-            <Panel Background="#1E1E1E">
-                <ScrollViewer x:Name="ImageScrollViewer"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
-                              IsVisible="{Binding HasImage}">
-                    <LayoutTransformControl HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <LayoutTransformControl.LayoutTransform>
-                            <TransformGroup>
-                                <RotateTransform Angle="{Binding Rotation}" />
-                                <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
-                            </TransformGroup>
-                        </LayoutTransformControl.LayoutTransform>
-                        <Image x:Name="ImageView"
-                               Source="{Binding CurrentImage}"
-                               Stretch="Uniform"
-                               StretchDirection="DownOnly" />
-                    </LayoutTransformControl>
-                </ScrollViewer>
-
-                <TextBlock Text="{loc:Loc OpenImagePrompt}"
-                           Foreground="#888"
-                           FontSize="16"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           IsVisible="{Binding !HasImage}" />
-            </Panel>
         </DockPanel>
     </Border>
 </Window>

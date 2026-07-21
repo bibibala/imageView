@@ -1,10 +1,27 @@
-.trae
-.dotnet
-.idea
+# NuGet
+.packages/
+.nuget/
+
+# Build
+bin/
+obj/
+
+# .NET SDK (bundled)
+.dotnet/
+.publish/
+
+# IDE
+.idea/
+.vs/
+.vscode/
+
+# macOS
 .DS_Store
-.thumbs.db
-.reasonix
+
+# Publish output
+publish/
+
+# Reasonix
+.reasonix/
 reasonix.toml
-src/Presentation/obj
-src/Presentation/bin
-publish
+.trae/

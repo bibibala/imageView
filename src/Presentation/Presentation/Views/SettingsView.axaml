@@ -1,0 +1,170 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ImageViewer.Presentation.ViewModels"
+        xmlns:loc="using:ImageViewer.Presentation.MarkupExtensions"
+        x:Class="ImageViewer.Presentation.Views.SettingsView"
+        x:DataType="vm:SettingsViewModel"
+        Title="{loc:Loc Settings}"
+        Width="520"
+        Height="400"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Styles>
+        <Style Selector="Button.tab-btn">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style Selector="Button.tab-btn:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAltListLowBrush}" />
+        </Style>
+        <Style Selector="Button.tab-btn.active">
+            <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAltListMediumBrush}" />
+        </Style>
+        <Style Selector="Border.setting-card">
+            <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+        <Style Selector="TextBlock.setting-title">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="MinHeight" Value="36" />
+        </Style>
+        <Style Selector="Button.link-btn">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style Selector="Button.link-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="160,*">
+        <!-- 左侧 Tab 栏 -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="12,16">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{loc:Loc Settings}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Margin="0,0,0,16" />
+                <Button Classes="tab-btn active"
+                        x:Name="GeneralTabBtn"
+                        Click="OnTabClick">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⚙" FontSize="16" />
+                        <TextBlock Text="通用设置" />
+                    </StackPanel>
+                </Button>
+                <Button Classes="tab-btn"
+                        x:Name="AboutTabBtn"
+                        Click="OnTabClick">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="ℹ" FontSize="16" />
+                        <TextBlock Text="关于" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- 右侧内容区 -->
+        <ScrollViewer Grid.Column="1" Padding="24">
+            <StackPanel>
+                <!-- 通用设置 -->
+                <StackPanel x:Name="GeneralPanel">
+                    <Border Classes="setting-card">
+                        <StackPanel>
+                            <TextBlock Classes="setting-title" Text="{loc:Loc Appearance}" />
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{loc:Loc Theme}" />
+                                <ComboBox ItemsSource="{Binding ThemeOptions}"
+                                          SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="setting-card">
+                        <StackPanel>
+                            <TextBlock Classes="setting-title" Text="{loc:Loc Language}" />
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{loc:Loc DisplayLanguage}" />
+                                <ComboBox ItemsSource="{Binding LanguageOptions}"
+                                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="vm:LanguageOption">
+                                            <TextBlock Text="{Binding DisplayName}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- 关于 -->
+                <StackPanel x:Name="AboutPanel" IsVisible="False">
+                    <Border Classes="setting-card">
+                        <StackPanel Spacing="12">
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <Border Width="64"
+                                        Height="64"
+                                        CornerRadius="16"
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                                    <TextBlock Text="🖼"
+                                               FontSize="32"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Image Viewer"
+                                               FontSize="20"
+                                               FontWeight="Bold" />
+                                    <TextBlock Text="Version 1.0.0"
+                                               Opacity="0.6"
+                                               Margin="0,4,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Border Height="1"
+                                    Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                    Opacity="0.2" />
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="作者"
+                                           FontWeight="Bold"
+                                           FontSize="14" />
+                                <Button Classes="link-btn"
+                                        Content="bibibala"
+                                        Click="OnOpenAuthorUrl" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="仓库"
+                                           FontWeight="Bold"
+                                           FontSize="14" />
+                                <Button Classes="link-btn"
+                                        Content="github.com/bibibala/imageView"
+                                        Click="OnOpenRepoUrl" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

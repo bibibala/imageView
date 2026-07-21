@@ -28,7 +28,15 @@ fi
 cd "$PROJECT_DIR"
 
 echo "编译 ImageViewer ($CONFIG)..."
+export NUGET_PACKAGES="$PROJECT_DIR/../.packages"
 "$DOTNET" build -c "$CONFIG"
+
+# 如果已有运行的 ImageViewer，先关闭再启动
+if pgrep -f "ImageViewer" > /dev/null 2>&1; then
+    echo "检测到已有 ImageViewer 进程，正在关闭..."
+    pkill -f "ImageViewer" 2>/dev/null || true
+    sleep 0.5
+fi
 
 echo "启动..."
 exec "$DOTNET" run -c "$CONFIG" --no-build

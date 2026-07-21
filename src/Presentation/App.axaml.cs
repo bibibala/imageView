@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using ImageViewer.AppServices.Interfaces;
 using ImageViewer.AppServices.Services;
 using ImageViewer.Presentation.ViewModels;
@@ -29,6 +30,15 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var settingsService = Services.GetRequiredService<ISettingsService>();
+            var theme = settingsService.Theme;
+            RequestedThemeVariant = theme switch
+            {
+                "Light" => ThemeVariant.Light,
+                "Dark" => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+
             var viewModel = Services.GetRequiredService<MainViewModel>();
             _vm = viewModel;
             desktop.MainWindow = new MainWindow
@@ -99,5 +109,6 @@ public partial class App : Application
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<MainViewModel>();
+        services.AddTransient<SettingsViewModel>();
     }
 }

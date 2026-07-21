@@ -25,6 +25,14 @@ public sealed class SettingsService : ISettingsService
         Save();
     }
 
+    public string Theme => _settings.Theme;
+
+    public void SetTheme(string theme)
+    {
+        _settings.Theme = theme;
+        Save();
+    }
+
     private SettingsData Load()
     {
         if (!File.Exists(_settingsFilePath))
@@ -51,5 +59,6 @@ public sealed class SettingsService : ISettingsService
     private sealed class SettingsData
     {
         public string Language { get; set; } = "auto";
+        public string Theme { get; set; } = "System";
     }
 }

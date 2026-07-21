@@ -24,6 +24,7 @@ public partial class MainViewModel : ViewModelBase
 
     private IReadOnlyList<ImageItem> _images = Array.Empty<ImageItem>();
     private int _currentIndex = -1;
+    private bool _isLoading;
 
     [ObservableProperty]
     private Bitmap? _currentImage;
@@ -200,25 +201,29 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(CanGoPrevious))]
     private async Task PreviousAsync()
     {
-        if (_currentIndex <= 0)
+        if (_isLoading || _currentIndex <= 0)
         {
             return;
         }
+        _isLoading = true;
         _currentIndex--;
         UpdateNavigationState();
         await LoadCurrentAsync();
+        _isLoading = false;
     }
 
     [RelayCommand(CanExecute = nameof(CanGoNext))]
     private async Task NextAsync()
     {
-        if (_currentIndex >= _images.Count - 1)
+        if (_isLoading || _currentIndex >= _images.Count - 1)
         {
             return;
         }
+        _isLoading = true;
         _currentIndex++;
         UpdateNavigationState();
         await LoadCurrentAsync();
+        _isLoading = false;
     }
 
     [RelayCommand]
@@ -243,6 +248,66 @@ public partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     private void ToggleFullScreen() => IsFullScreen = !IsFullScreen;
+
+    public bool CanDelete => HasImage && _currentIndex >= 0 && _currentIndex < _images.Count;
+
+    [RelayCommand(CanExecute = nameof(CanDelete))]
+    private async Task DeleteCurrentImageAsync()
+    {
+        if (_currentIndex < 0 || _currentIndex >= _images.Count)
+        {
+            return;
+        }
+
+        var item = _images[_currentIndex];
+        var deletedPath = item.FilePath;
+
+        _isLoading = true;
+
+        try
+        {
+            var list = new List<ImageItem>(_images);
+            list.RemoveAt(_currentIndex);
+
+            if (list.Count == 0)
+            {
+                _images = Array.Empty<ImageItem>();
+                _currentIndex = -1;
+                CurrentImage = null;
+                CurrentItem = null;
+                HasImage = false;
+                StatusMessage = _localizationService.GetString("StatusOpenImageOrFolder");
+            }
+            else
+            {
+                _images = list;
+                if (_currentIndex >= _images.Count)
+                {
+                    _currentIndex = _images.Count - 1;
+                }
+                await LoadCurrentAsync();
+            }
+
+            UpdateNavigationState();
+
+            try
+            {
+                File.Delete(deletedPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "删除文件失败: {FilePath}", deletedPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "删除图片失败");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
 
     [RelayCommand]
     private void ToggleTheme()
@@ -302,7 +367,7 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-    private void UpdateScale(double newScale)
+    public void UpdateScale(double newScale)
     {
         Scale = Math.Clamp(newScale, MinScale, MaxScale);
         StatusMessage = _localizationService.GetString("StatusZoom", Scale * 100);

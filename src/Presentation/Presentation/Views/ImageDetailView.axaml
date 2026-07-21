@@ -1,0 +1,115 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:ImageViewer.Presentation.Views"
+        x:Class="ImageViewer.Presentation.Views.ImageDetailView"
+        Title="图片详情"
+        Width="480"
+        Height="560"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,12,0,4" />
+        </Style>
+        <Style Selector="TextBlock.value">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.exif-dir">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="Margin" Value="0,14,0,6" />
+        </Style>
+        <Style Selector="TextBlock.exif-name">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style Selector="TextBlock.exif-value">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer Padding="24">
+        <StackPanel Spacing="0">
+            <!-- 基本信息 -->
+            <StackPanel>
+                <TextBlock Classes="label" Text="文件名" />
+                <TextBlock x:Name="FileNameText" Classes="value" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Classes="label" Text="格式" />
+                <TextBlock x:Name="FormatText" Classes="value" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Classes="label" Text="图片尺寸" />
+                <TextBlock x:Name="DimensionText" Classes="value" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Classes="label" Text="文件大小" />
+                <TextBlock x:Name="FileSizeText" Classes="value" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Classes="label" Text="修改时间" />
+                <TextBlock x:Name="ModifiedTimeText" Classes="value" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Classes="label" Text="文件路径" />
+                <TextBlock x:Name="FilePathText" Classes="value" />
+            </StackPanel>
+
+            <!-- 分隔 -->
+            <Border Height="1"
+                    Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    Opacity="0.2"
+                    Margin="0,16,0,8" />
+
+            <!-- EXIF 信息 -->
+            <TextBlock Text="EXIF 信息"
+                       FontWeight="Bold"
+                       FontSize="16"
+                       Margin="0,0,0,4" />
+
+            <TextBlock x:Name="NoExifText"
+                       Text="无 EXIF 数据"
+                       Opacity="0.5"
+                       FontSize="13" />
+
+            <ItemsControl x:Name="ExifItemsControl">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="views:ExifGroup">
+                        <StackPanel>
+                            <TextBlock Classes="exif-dir"
+                                       Text="{Binding DirectoryName}" />
+                            <ItemsControl ItemsSource="{Binding Tags}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="views:ExifTag">
+                                        <Grid ColumnDefinitions="180,*"
+                                              Margin="0,3">
+                                            <TextBlock Grid.Column="0"
+                                                       Classes="exif-name"
+                                                       Text="{Binding Name}" />
+                                            <TextBlock Grid.Column="1"
+                                                       Classes="exif-value"
+                                                       Text="{Binding Value}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

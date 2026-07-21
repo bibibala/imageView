@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using ImageViewer.AppServices.Interfaces;
 using ImageViewer.Presentation.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +21,6 @@ public partial class MainWindow : Window
     private readonly ILocalizationService _localizationService;
 
     private double _wheelAccumulator;
-
     private const double WheelThreshold = 0.5;
 
     public MainWindow()
@@ -47,6 +48,24 @@ public partial class MainWindow : Window
                 DisableWindowsSystemCorners();
             }
         };
+
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is MainViewModel vm)
+        {
+            vm.PropertyChanged += OnViewModelPropertyChanged;
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.IsFullScreen) && sender is MainViewModel vm)
+        {
+            WindowState = vm.IsFullScreen ? WindowState.FullScreen : WindowState.Normal;
+        }
     }
 
     private void DisableWindowsSystemCorners()
@@ -72,12 +91,36 @@ public partial class MainWindow : Window
         }
     }
 
-    private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    private void OnWindowPointerPressed(object? sender, PointerPressedEventArgs e)
     {
+        // 图片区域的双指操作由 OnSwipePointerPressed 处理缩放/翻页，
+        // 此处拦截避免触发系统级窗口拖动，否则后续 PointerMoved 会被 BeginMoveDrag 吞掉。
+        if (IsInImageArea(e))
+        {
+            return;
+        }
+
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             BeginMoveDrag(e);
         }
+    }
+
+    private bool IsInImageArea(PointerEventArgs e)
+    {
+        if (e.Source is Visual source)
+        {
+            var current = source;
+            while (current is not null)
+            {
+                if (ReferenceEquals(current, ImageView))
+                {
+                    return true;
+                }
+                current = current.GetVisualParent();
+            }
+        }
+        return false;
     }
 
     private void OnMinimizeClick(object? sender, RoutedEventArgs e)
@@ -129,6 +172,41 @@ public partial class MainWindow : Window
         {
             var path = folders[0].Path.LocalPath;
             await Dispatcher.UIThread.InvokeAsync(() => ViewModel.OpenFolderCommand.Execute(path));
+        }
+    }
+
+    private void OnSettingsClick(object? sender, RoutedEventArgs e)
+    {
+        var viewModel = App.Services.GetRequiredService<SettingsViewModel>();
+        var settingsWindow = new SettingsView(viewModel);
+        settingsWindow.ShowDialog(this);
+    }
+
+    private void OnImageDetailClick(object? sender, RoutedEventArgs e)
+    {
+        if (!ViewModel.HasImage || ViewModel.CurrentItem is null || ViewModel.CurrentImage is null)
+        {
+            return;
+        }
+
+        var detailView = new ImageDetailView(ViewModel.CurrentItem, ViewModel.CurrentImage.PixelSize);
+        detailView.ShowDialog(this);
+    }
+
+    private async void OnDeleteImageClick(object? sender, RoutedEventArgs e)
+    {
+        if (!ViewModel.HasImage)
+        {
+            return;
+        }
+
+        var message = _localizationService.GetString("ConfirmDeleteMessage");
+        var dialog = new ConfirmDialog(message);
+        await dialog.ShowDialog(this);
+
+        if (dialog.Confirmed)
+        {
+            ViewModel.DeleteCurrentImageCommand.Execute(null);
         }
     }
 
@@ -231,19 +309,27 @@ public partial class MainWindow : Window
             return;
         }
 
-        _wheelAccumulator += e.Delta.Y;
+        var isMacZoom = OperatingSystem.IsMacOS() && e.KeyModifiers.HasFlag(KeyModifiers.Meta);
+        var isWinZoom = OperatingSystem.IsWindows() && e.KeyModifiers.HasFlag(KeyModifiers.Alt);
+        var hasZoomModifier = isMacZoom || isWinZoom;
 
-        if (_wheelAccumulator >= WheelThreshold)
+        if (hasZoomModifier || e.KeyModifiers == KeyModifiers.None)
         {
-            ViewModel.ZoomInCommand.Execute(null);
-            _wheelAccumulator = 0;
-        }
-        else if (_wheelAccumulator <= -WheelThreshold)
-        {
-            ViewModel.ZoomOutCommand.Execute(null);
-            _wheelAccumulator = 0;
-        }
+            _wheelAccumulator += e.Delta.Y;
 
-        e.Handled = true;
+            if (_wheelAccumulator >= WheelThreshold)
+            {
+                ViewModel.ZoomInCommand.Execute(null);
+                _wheelAccumulator = 0;
+            }
+            else if (_wheelAccumulator <= -WheelThreshold)
+            {
+                ViewModel.ZoomOutCommand.Execute(null);
+                _wheelAccumulator = 0;
+            }
+
+            e.Handled = true;
+        }
     }
+
 }
