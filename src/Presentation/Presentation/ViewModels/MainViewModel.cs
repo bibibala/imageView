@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -8,6 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace ImageViewer.Presentation.ViewModels;
 
+public sealed record LanguageOption(string Code, string DisplayName);
+
 public partial class MainViewModel : ViewModelBase
 {
     private const double MinScale = 0.1;
@@ -15,6 +19,7 @@ public partial class MainViewModel : ViewModelBase
     private const double ZoomStep = 0.15;
 
     private readonly IImageService _imageService;
+    private readonly ILocalizationService _localizationService;
     private readonly ILogger<MainViewModel> _logger;
 
     private IReadOnlyList<ImageItem> _images = Array.Empty<ImageItem>();
@@ -39,10 +44,20 @@ public partial class MainViewModel : ViewModelBase
     private bool _isFullScreen;
 
     [ObservableProperty]
-    private string _statusMessage = "请打开图片或文件夹";
+    private string _statusMessage = string.Empty;
 
     [ObservableProperty]
     private bool _hasImage;
+
+    [ObservableProperty]
+    private LanguageOption? _selectedLanguage;
+
+    public ObservableCollection<LanguageOption> LanguageOptions { get; } = new()
+    {
+        new LanguageOption("auto", "跟随系统 / System"),
+        new LanguageOption("zh", "简体中文"),
+        new LanguageOption("en", "English")
+    };
 
     private string _themeLabel = "🌓";
 
@@ -52,10 +67,51 @@ public partial class MainViewModel : ViewModelBase
         private set => SetProperty(ref _themeLabel, value);
     }
 
-    public MainViewModel(IImageService imageService, ILogger<MainViewModel> logger)
+    public MainViewModel(IImageService imageService, ILocalizationService localizationService, ILogger<MainViewModel> logger)
     {
         _imageService = imageService;
+        _localizationService = localizationService;
         _logger = logger;
+        _localizationService.PropertyChanged += (_, _) => RefreshLocalizedStrings();
+        SelectedLanguage = LanguageOptions.FirstOrDefault(x => x.Code == _localizationService.CurrentLanguageCode);
+        StatusMessage = _localizationService.GetString("StatusOpenImageOrFolder");
+    }
+
+    partial void OnSelectedLanguageChanged(LanguageOption? value)
+    {
+        if (value is not null && value.Code != _localizationService.CurrentLanguageCode)
+        {
+            _localizationService.SetLanguage(value.Code);
+            RestartApplication();
+        }
+    }
+
+    private static void RestartApplication()
+    {
+        var process = Process.GetCurrentProcess();
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = process.MainModule?.FileName ?? process.StartInfo.FileName,
+            UseShellExecute = true
+        };
+        Process.Start(startInfo);
+        Environment.Exit(0);
+    }
+
+    private void RefreshLocalizedStrings()
+    {
+        if (!HasImage)
+        {
+            StatusMessage = _localizationService.GetString("StatusOpenImageOrFolder");
+            return;
+        }
+
+        if (CurrentItem is null)
+        {
+            return;
+        }
+
+        StatusMessage = _localizationService.GetString("StatusImageInfo", _currentIndex + 1, _images.Count, CurrentItem.FileName, CurrentItem.FileSizeDisplay);
     }
 
     public void HandleCommandLineArgs(string?[]? args)
@@ -125,14 +181,14 @@ public partial class MainViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
         {
-            StatusMessage = "文件夹不存在";
+            StatusMessage = _localizationService.GetString("StatusFolderNotFound");
             return;
         }
 
         _images = _imageService.LoadDirectory(folderPath);
         if (_images.Count == 0)
         {
-            StatusMessage = "该文件夹下未找到支持的图片";
+            StatusMessage = _localizationService.GetString("StatusNoSupportedImages");
             return;
         }
 
@@ -176,7 +232,7 @@ public partial class MainViewModel : ViewModelBase
     {
         Scale = 1.0;
         Rotation = 0;
-        StatusMessage = "已重置";
+        StatusMessage = _localizationService.GetString("StatusReset");
     }
 
     [RelayCommand]
@@ -210,7 +266,7 @@ public partial class MainViewModel : ViewModelBase
         var item = await _imageService.LoadAsync(filePath);
         if (item is null)
         {
-            StatusMessage = "无法加载图片";
+            StatusMessage = _localizationService.GetString("StatusCannotLoadImage");
             return;
         }
 
@@ -235,20 +291,20 @@ public partial class MainViewModel : ViewModelBase
             HasImage = true;
             Scale = 1.0;
             Rotation = 0;
-            StatusMessage = $"{_currentIndex + 1} / {_images.Count}  -  {item.FileName}  -  {item.FileSizeDisplay}";
+            StatusMessage = _localizationService.GetString("StatusImageInfo", _currentIndex + 1, _images.Count, item.FileName, item.FileSizeDisplay);
             PreviousCommand.NotifyCanExecuteChanged();
             NextCommand.NotifyCanExecuteChanged();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "加载图片失败: {FilePath}", item.FilePath);
-            StatusMessage = $"加载失败: {item.FileName}";
+            StatusMessage = _localizationService.GetString("StatusLoadFailed", item.FileName);
         }
     }
 
     private void UpdateScale(double newScale)
     {
         Scale = Math.Clamp(newScale, MinScale, MaxScale);
-        StatusMessage = $"缩放: {Scale * 100:F0}%";
+        StatusMessage = _localizationService.GetString("StatusZoom", Scale * 100);
     }
 }

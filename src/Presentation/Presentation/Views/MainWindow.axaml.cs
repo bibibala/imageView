@@ -5,7 +5,9 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using ImageViewer.AppServices.Interfaces;
 using ImageViewer.Presentation.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.InteropServices;
 
 namespace ImageViewer.Presentation.Views;
@@ -14,12 +16,15 @@ public partial class MainWindow : Window
 {
     private MainViewModel ViewModel => (MainViewModel)DataContext!;
 
+    private readonly ILocalizationService _localizationService;
+
     private double _wheelAccumulator;
 
     private const double WheelThreshold = 0.5;
 
     public MainWindow()
     {
+        _localizationService = App.Services.GetRequiredService<ILocalizationService>();
         InitializeComponent();
         AddHandler(DragDrop.DropEvent, OnDrop);
         AddHandler(KeyDownEvent, OnKeyDown);
@@ -94,11 +99,11 @@ public partial class MainWindow : Window
     {
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title = "选择图片",
+            Title = _localizationService.GetString("PickerTitleOpenImage"),
             AllowMultiple = false,
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("图片")
+                new FilePickerFileType(_localizationService.GetString("FilePickerImage"))
                 {
                     Patterns = new[] { "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.tiff", "*.tif" }
                 }
@@ -116,7 +121,7 @@ public partial class MainWindow : Window
     {
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "选择文件夹",
+            Title = _localizationService.GetString("PickerTitleOpenFolder"),
             AllowMultiple = false,
         });
 

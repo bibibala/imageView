@@ -1,13 +1,14 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:ImageViewer.Presentation.ViewModels"
+        xmlns:loc="using:ImageViewer.Presentation.MarkupExtensions"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
         x:Class="ImageViewer.Presentation.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Image"
+        Title="{loc:Loc AppTitle}"
         Width="1000" Height="700"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
@@ -53,14 +54,15 @@
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
-        <Style Selector="Button.tool-btn:pointerover /template/ContentPresenter">
-            <Setter Property="Background" Value="#20FFFFFF" />
+        <Style Selector="Button.tool-btn:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAltListLowBrush}" />
         </Style>
     </Window.Styles>
 
     <Design.DataContext>
         <vm:MainViewModel>
             <x:Arguments>
+                <x:Null />
                 <x:Null />
                 <x:Null />
             </x:Arguments>
@@ -80,33 +82,53 @@
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <!-- 左侧：macOS 交通灯按钮 -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Classes="traffic-light close-btn" Click="OnCloseClick" ToolTip.Tip="关闭" />
-                        <Button Classes="traffic-light minimize-btn" Click="OnMinimizeClick" ToolTip.Tip="最小化" />
-                        <Button Classes="traffic-light maximize-btn" Click="OnMaximizeClick" ToolTip.Tip="最大化" />
+                        <Button Classes="traffic-light close-btn" Click="OnCloseClick" ToolTip.Tip="{loc:Loc Close}" />
+                        <Button Classes="traffic-light minimize-btn" Click="OnMinimizeClick" ToolTip.Tip="{loc:Loc Minimize}" />
+                        <Button Classes="traffic-light maximize-btn" Click="OnMaximizeClick" ToolTip.Tip="{loc:Loc Maximize}" />
                     </StackPanel>
 
                     <!-- 右侧工具按钮 -->
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Button Classes="tool-btn" Content="📁" Click="OnOpenFileClick" ToolTip.Tip="打开图片" />
-                        <Button Classes="tool-btn" Content="📂" Click="OnOpenFolderClick" ToolTip.Tip="打开文件夹" />
+                        <Button Classes="tool-btn" Content="📁" Click="OnOpenFileClick" ToolTip.Tip="{loc:Loc OpenImage}" />
+                        <Button Classes="tool-btn" Content="📂" Click="OnOpenFolderClick" ToolTip.Tip="{loc:Loc OpenFolder}" />
                         <Button Classes="tool-btn" Content="◐" Command="{Binding ToggleThemeCommand}"
-                                ToolTip.Tip="切换主题" />
+                                ToolTip.Tip="{loc:Loc ToggleTheme}" />
                         <Button Classes="tool-btn" Content="⛶" Command="{Binding ToggleFullScreenCommand}"
-                                ToolTip.Tip="全屏" />
+                                ToolTip.Tip="{loc:Loc FullScreen}" />
                         <Button Classes="tool-btn" Content="↻" Command="{Binding RotateClockwiseCommand}"
-                                ToolTip.Tip="右旋90°" />
+                                ToolTip.Tip="{loc:Loc RotateClockwise}" />
                         <Button Classes="tool-btn" Content="↺" Command="{Binding RotateCounterClockwiseCommand}"
-                                ToolTip.Tip="左旋90°" />
+                                ToolTip.Tip="{loc:Loc RotateCounterClockwise}" />
                         <Button Classes="tool-btn" Content="+" Command="{Binding ZoomInCommand}"
-                                ToolTip.Tip="放大" />
+                                ToolTip.Tip="{loc:Loc ZoomIn}" />
                         <Button Classes="tool-btn" Content="−" Command="{Binding ZoomOutCommand}"
-                                ToolTip.Tip="缩小" />
-                        <Button Classes="tool-btn" Content="1" Command="{Binding ResetTransformCommand}"
-                                ToolTip.Tip="重置" />
+                                ToolTip.Tip="{loc:Loc ZoomOut}" />
+                        <Button Classes="tool-btn" Content="🗗" Command="{Binding ResetTransformCommand}"
+                                ToolTip.Tip="{loc:Loc Reset}" />
                         <Button Classes="tool-btn" Content="◀" Command="{Binding PreviousCommand}"
-                                IsEnabled="{Binding CanGoPrevious}" ToolTip.Tip="上一张" />
+                                IsEnabled="{Binding CanGoPrevious}" ToolTip.Tip="{loc:Loc Previous}" />
                         <Button Classes="tool-btn" Content="▶" Command="{Binding NextCommand}"
-                                IsEnabled="{Binding CanGoNext}" ToolTip.Tip="下一张" />
+                                IsEnabled="{Binding CanGoNext}" ToolTip.Tip="{loc:Loc Next}" />
+                        <Button Classes="tool-btn" Content="⚙" ToolTip.Tip="{loc:Loc Settings}">
+                            <Button.Flyout>
+                                <Flyout Placement="Bottom">
+                                    <Border Padding="12" Width="220">
+                                        <StackPanel Spacing="8">
+                                            <TextBlock Text="{loc:Loc Language}" FontWeight="Medium" />
+                                            <ComboBox ItemsSource="{Binding LanguageOptions}"
+                                                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                                                      HorizontalAlignment="Stretch">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate DataType="vm:LanguageOption">
+                                                        <TextBlock Text="{Binding DisplayName}" />
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Border>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -136,7 +158,7 @@
                     </LayoutTransformControl>
                 </ScrollViewer>
 
-                <TextBlock Text="拖入图片或点击工具栏打开"
+                <TextBlock Text="{loc:Loc OpenImagePrompt}"
                            Foreground="#888"
                            FontSize="16"
                            HorizontalAlignment="Center"

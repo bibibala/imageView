@@ -96,6 +96,8 @@ public partial class App : Application
     {
         services.AddLogging(builder => builder.AddConsole());
         services.AddSingleton<IImageService, ImageService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<MainViewModel>();
     }
 }
