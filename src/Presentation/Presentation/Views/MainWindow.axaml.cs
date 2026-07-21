@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using ImageViewer.Presentation.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace ImageViewer.Presentation.Views;
 
@@ -24,7 +25,37 @@ public partial class MainWindow : Window
         AddHandler(KeyDownEvent, OnKeyDown);
         AddHandler(PointerWheelChangedEvent, OnPointerWheelChanged);
         ImageScrollViewer.LayoutUpdated += OnScrollViewerLayoutUpdated;
+
+        if (OperatingSystem.IsMacOS())
+        {
+            TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent };
+        }
+        else if (OperatingSystem.IsWindows())
+        {
+            TransparencyLevelHint = new[] { WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Transparent };
+        }
+
+        Opened += (_, _) =>
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                DisableWindowsSystemCorners();
+            }
+        };
     }
+
+    private void DisableWindowsSystemCorners()
+    {
+        var hwnd = TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+        if (hwnd != IntPtr.Zero)
+        {
+            int preference = 1;
+            DwmSetWindowAttribute(hwnd, 33, ref preference, sizeof(int));
+        }
+    }
+
+    [DllImport("dwmapi.dll")]
+    static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
     private void OnScrollViewerLayoutUpdated(object? sender, EventArgs e)
     {
@@ -34,6 +65,29 @@ public partial class MainWindow : Window
             ImageView.MaxWidth = viewport.Width;
             ImageView.MaxHeight = viewport.Height;
         }
+    }
+
+    private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginMoveDrag(e);
+        }
+    }
+
+    private void OnMinimizeClick(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void OnMaximizeClick(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void OnCloseClick(object? sender, RoutedEventArgs e)
+    {
+        Close();
     }
 
     private async void OnOpenFileClick(object? sender, RoutedEventArgs e)
@@ -107,6 +161,27 @@ public partial class MainWindow : Window
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
+        var isMeta = e.KeyModifiers.HasFlag(KeyModifiers.Meta) || e.KeyModifiers.HasFlag(KeyModifiers.Control);
+
+        if (isMeta)
+        {
+            switch (e.Key)
+            {
+                case Key.M:
+                    WindowState = WindowState.Minimized;
+                    e.Handled = true;
+                    return;
+                case Key.W:
+                    Close();
+                    e.Handled = true;
+                    return;
+                case Key.F:
+                    ViewModel.ToggleFullScreenCommand.Execute(null);
+                    e.Handled = true;
+                    return;
+            }
+        }
+
         switch (e.Key)
         {
             case Key.Left:
