@@ -26,11 +26,12 @@
 !endif
 
 ; ========== Base config ==========
+; 按用户安装 (perMachine: false): 装到 %LOCALAPPDATA%\Programs，无需管理员权限
 Name "${APP_TITLE}"
 OutFile "${OUTPUT_DIR}/../${APP_TITLE}-${APP_VERSION}-win-x64.exe"
-InstallDir "$PROGRAMFILES64\${APP_TITLE}"
-InstallDirRegKey HKLM "Software\${APP_PUBLISHER}\${APP_TITLE}" "InstallDir"
-RequestExecutionLevel admin
+InstallDir "$LOCALAPPDATA\Programs\${APP_TITLE}"
+InstallDirRegKey HKCU "Software\${APP_PUBLISHER}\${APP_TITLE}" "InstallDir"
+RequestExecutionLevel user
 SetCompressor /SOLID lzma
 
 ; ========== MUI2 ==========
@@ -59,16 +60,16 @@ Section "${APP_TITLE} (required)" SecMain
   File /r "${OUTPUT_DIR}\*.*"
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
-  WriteRegStr HKLM "Software\${APP_PUBLISHER}\${APP_TITLE}" "InstallDir" "$INSTDIR"
-  WriteRegStr HKLM "Software\${APP_PUBLISHER}\${APP_TITLE}" "Version" "${APP_VERSION}"
+  WriteRegStr HKCU "Software\${APP_PUBLISHER}\${APP_TITLE}" "InstallDir" "$INSTDIR"
+  WriteRegStr HKCU "Software\${APP_PUBLISHER}\${APP_TITLE}" "Version" "${APP_VERSION}"
 
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayName" "${APP_TITLE}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayVersion" "${APP_VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "Publisher" "${APP_PUBLISHER}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayIcon" '"$INSTDIR\${APP_NAME}.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "NoRepair" 1
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayName" "${APP_TITLE}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayVersion" "${APP_VERSION}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "Publisher" "${APP_PUBLISHER}"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "DisplayIcon" '"$INSTDIR\${APP_NAME}.exe"'
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "NoModify" 1
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}" "NoRepair" 1
 SectionEnd
 
 Section "Start Menu Shortcut" SecStartMenu
@@ -88,6 +89,7 @@ SectionEnd
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ; ========== Uninstall ==========
+; deleteAppDataOnUninstall: true - 卸载时清理用户数据
 Section "Uninstall"
   Delete "$INSTDIR\uninstall.exe"
   RMDir /r "$INSTDIR"
@@ -96,6 +98,10 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\${APP_TITLE}"
   Delete "$DESKTOP\${APP_TITLE}.lnk"
 
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}"
-  DeleteRegKey HKLM "Software\${APP_PUBLISHER}\${APP_TITLE}"
+  ; 清理用户数据 (deleteAppDataOnUninstall: true)
+  RMDir /r "$APPDATA\${APP_TITLE}"
+  RMDir /r "$LOCALAPPDATA\${APP_TITLE}"
+
+  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_TITLE}"
+  DeleteRegKey HKCU "Software\${APP_PUBLISHER}\${APP_TITLE}"
 SectionEnd

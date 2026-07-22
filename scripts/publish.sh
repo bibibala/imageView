@@ -7,10 +7,17 @@
 #   ./publish.sh win-x64            # 发布 Windows x64
 #
 # 体积优化（可选，追加在 RID 后面）:
-#   ./publish.sh osx-arm64 --small  # 关闭 Invariant Globalization + trim，体积明显变小
+#   ./publish.sh osx-arm64 --small  # 启用体积优化，Windows 通常从 200MB+ 降到 80-100MB
+#   ./publish.sh win-x64 --small    # 同上，Windows x64
+#
+# --small 会启用以下 dotnet publish 优化项:
+#   -p:InvariantGlobalization=true   # 移除国际化数据 (省 20MB+)
+#   -p:PublishTrimmed=true           # 启用裁剪
+#   -p:TrimMode=partial              # 部分裁剪 (保守模式，保留被反射引用的程序集)
 #
 # 注意: --small 会做裁剪(trim)，Avalonia 大量使用反射加载 XAML，
 #       裁剪后请务必把每个界面都点一遍测试，确认没有控件/绑定丢失。
+#       若发现控件丢失，可改用 TrimMode=full 配合 TrimmerRootDescriptor 显式保留根程序集。
 
 set -e
 
@@ -89,6 +96,7 @@ rm -rf "$OUTPUT_DIR/$RID"
 PUBLISH_ARGS=(
     -c Release -r "$RID"
     --self-contained true
+    -p:PublishSingleFile=true
     -p:DebugType=none
     -p:DebugSymbols=false
 )
